@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { getResource } from "../../api";
 import { pushElement } from "../../utils";
-import Modal from "../modal/modal";
+import Modal from "../modal";
+import CardsList from "../cards-list";
 
 const App: React.FC = () => {
-  const [state, setState] = useState<Array<string>>([]);
+  const [state, setState] = useState<Array<any>>([]);
   const [inputTeg, setInputTeg] = useState("");
   const [loadError, setLoadError] = useState(false);
   const [buttonDisabled, setbuttonDisabled] = useState(false);
@@ -13,11 +14,14 @@ const App: React.FC = () => {
     evt.preventDefault();
     setbuttonDisabled(true);
     getResource(inputTeg).then(({ data: { data } }) => {
+      const imageData: { imageUrl: string; category: string } = {
+        imageUrl: data.image_url,
+        category: inputTeg,
+      };
       data.length === 0
         ? setLoadError(true)
-        : setState(pushElement(state, data.image_url));
+        : setState(pushElement(state, imageData));
       setbuttonDisabled(false);
-
       console.log(state);
     });
   };
@@ -57,7 +61,7 @@ const App: React.FC = () => {
               className="btn btn-success mb-3"
               disabled={buttonDisabled}
             >
-              {`${buttonDisabled ? 'Загрузка...' : 'Загрузить'}`}
+              {`${buttonDisabled ? "Загрузка..." : "Загрузить"}`}
             </button>
           </div>
           <div className="col-auto">
@@ -75,6 +79,7 @@ const App: React.FC = () => {
             </button>
           </div>
         </form>
+        <CardsList state={state} />
       </div>
     </>
   );
