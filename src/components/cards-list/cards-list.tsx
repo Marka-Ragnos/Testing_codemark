@@ -1,20 +1,27 @@
 import React from "react";
-import Card from "../card";
+import CardsGrouped from "../cards-grouped";
+import CardsUnGrouped from "../cards-un-grouped";
 
-type cardsListProps = {
-  state: Array<{
-    imageUrl: string;
-    category: string;
-  }>;
+type stateProps = {
+  state:
+    | Array<{
+        id: number;
+        imageUrl: string;
+        category: string;
+      }>
+    | Object;
+  handleTakeCategory: Function;
 };
 
-const CardsList: React.FC<cardsListProps> = ({ state }) => {
+const CardsList: React.FC<stateProps> = ({ state, handleTakeCategory }) => {
   return (
-    <div className="row row-cols-1 row-cols-md-3 g-4">
-      {state.map((item, index) => (
-        <Card key={index + item.imageUrl} card={item} />
-      ))}
-    </div>
+    <>
+      {Array.isArray(state) ? (
+        <CardsUnGrouped state={state} handleTakeCategory={handleTakeCategory} />
+      ) : (
+        <CardsGrouped state={state} handleTakeCategory={handleTakeCategory} />
+      )}
+    </>
   );
 };
 

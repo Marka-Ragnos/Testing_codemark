@@ -1,19 +1,22 @@
 import React from "react";
 
 type cardProps = {
-	card: {
-		imageUrl: string;
-		category: string;
-	}
+  card: {
+    id: number;
+    imageUrl: string;
+    category: string;
+  };
+  handleTakeCategory: Function;
 };
 
-const Card: React.FC<cardProps> = ({ card }) => {
+const Card: React.FC<cardProps> = ({ card, handleTakeCategory }) => {
   return (
     <div className="card">
       <img
-				src={card.imageUrl}
-				className="card-img-top"
-				alt={card.category}
+        src={card.imageUrl}
+        className="card-img-top"
+        alt={card.category}
+        onClick={(evt) => handleTakeCategory(evt)}
       ></img>
     </div>
   );
