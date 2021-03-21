@@ -4,7 +4,6 @@ import { pushElement, groupBy, objectIsEmpty } from "../../utils";
 import Modal from "../modal";
 import CardsList from "../cards-list";
 
-
 const App: React.FC = () => {
   const [state, setState] = useState<Array<any>>([]);
   const [stateGrouped, setStateGrouped] = useState<Object>({});
@@ -15,21 +14,32 @@ const App: React.FC = () => {
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
     evt.preventDefault();
     setbuttonDisabled(true);
-    getResource(inputTeg).then(({ data: { data } }) => {
-      const imageData: { id: number; imageUrl: string; category: string } = {
-        id: state.length + 1,
-        imageUrl: data.image_url,
-        category: inputTeg,
-      };
-      data.length === 0
-        ? setLoadError(true)
-        : setState(pushElement(state, imageData));
-      setbuttonDisabled(false);
-      console.log(state);
+    const brokenText = inputTeg.split(/,\s*/);
+    /*     Пытался сделать параллельные запросы с помощью Promise.all не вышло, покопался в доке API думал склеить запросы с комбинированными параметрами через & - API не поддерживает
+     */
+    brokenText.forEach((request) => {
+      getResource(request).then(({ data: { data } }) => {
+        const imageData: {
+          id: number;
+          imageUrl: string;
+          category: string;
+        } = {
+          id: state.length + 1,
+          imageUrl: data.image_url,
+          category: request,
+        };
+        data.length === 0
+          ? setLoadError(true)
+          : setState(pushElement(state, imageData));
+        setbuttonDisabled(false);
+      });
     });
   };
 
   const handleGrouping = (state: Array<any>): void => {
+    const key: string = "category";
+    const stateFinished = groupBy(key)(state);
+
     if (state.length === 0) {
       return;
     }
@@ -38,14 +48,11 @@ const App: React.FC = () => {
       return;
     }
 
-    const key: string = "category";
-    const stateFinished = groupBy(key)(state);
     setStateGrouped(stateFinished);
-    console.log(stateFinished, state);
   };
 
   const handleTakeCategory = (evt: React.SyntheticEvent): void => {
-    const category = evt.currentTarget.getAttribute('alt');
+    const category = evt.currentTarget.getAttribute("alt");
     setInputTeg(String(category));
   };
 
@@ -56,7 +63,8 @@ const App: React.FC = () => {
   const handleInputChange = (
     evt: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setInputTeg(evt.target.value);
+    const target = evt.target.value.replace(/[^A-Za-z,\s]/g, "");
+    setInputTeg(target);
   };
 
   const handleInputReset = (): void => {
