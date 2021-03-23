@@ -14,6 +14,7 @@ type stateProps = {
 };
 
 const CardsList: React.FC<stateProps> = ({ state, handleTakeCategory }) => {
+  const state = useSelector(state => state)
   return (
     <>
       {Array.isArray(state) ? (

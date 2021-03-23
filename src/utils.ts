@@ -1,3 +1,11 @@
+type initialProps = {
+  data: Array<any>;
+  dataGrouped: object;
+  inputTeg: string;
+  loadError: boolean;
+  buttonDisabled: boolean;
+};
+
 export const pushElement = (
   array: Array<any>,
   element: Object
@@ -15,3 +23,6 @@ export const groupBy = (key: string) => (array: Array<any>) => {
 export const objectIsEmpty = (obj: {}) => {
   return Object.keys(obj).length === 0;
 };
+
+export const extend = (target: initialProps, update: object): initialProps =>
+  Object.assign({}, target, update);

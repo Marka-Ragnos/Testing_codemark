@@ -1,22 +1,57 @@
 import React, { useState } from "react";
-import { getResource } from "../../api";
+// import { getResource } from "../../api";
 import { pushElement, groupBy, objectIsEmpty } from "../../utils";
 import Modal from "../modal";
 import CardsList from "../cards-list";
+import { connect } from "react-redux";
+import { InitialProps, Actions } from "../../types/state";
+import { getData, getdataGrouped, getInputTeg, getLoadError, getButtonDisabled } from '../../store/selectors';
+import { Dispatch } from "redux";
+import { Operation } from "../../store/reducer";
 
-const App: React.FC = () => {
-  const [state, setState] = useState<Array<any>>([]);
-  const [stateGrouped, setStateGrouped] = useState<Object>({});
-  const [inputTeg, setInputTeg] = useState("");
-  const [loadError, setLoadError] = useState(false);
-  const [buttonDisabled, setbuttonDisabled] = useState(false);
 
+
+
+const App: React.FC<InitialProps> = ({
+  data,
+  dataGrouped,
+  inputTeg,
+  loadError,
+  buttonDisabled,
+}) => {
+  
+  // const [state, setState] = useState<Array<any>>([]);
+  // const [stateGrouped, setStateGrouped] = useState<Object>({});
+  // const [inputTeg, setInputTeg] = useState("");
+  // const [loadError, setLoadError] = useState(false);
+  // const [buttonDisabled, setbuttonDisabled] = useState(false);
+
+  // const handleSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
+  //   evt.preventDefault();
+  //   setbuttonDisabled(true);
+  //   const brokenText = inputTeg.split(/,\s*/);
+  //   brokenText.forEach((request) => {
+  //     getResource(request).then(({ data: { data } }) => {
+  //       const imageData: {
+  //         id: number;
+  //         imageUrl: string;
+  //         category: string;
+  //       } = {
+  //         id: state.length + 1,
+  //         imageUrl: data.image_url,
+  //         category: request,
+  //       };
+  //       data.length === 0
+  //         ? setLoadError(true)
+  //         : setState(pushElement(state, imageData));
+  //       setbuttonDisabled(false);
+  //     });
+  //   });
+  // };
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>): void => {
     evt.preventDefault();
     setbuttonDisabled(true);
     const brokenText = inputTeg.split(/,\s*/);
-    /*     Пытался сделать параллельные запросы с помощью Promise.all не вышло, покопался в доке API думал склеить запросы с комбинированными параметрами через & - API не поддерживает
-     */
     brokenText.forEach((request) => {
       getResource(request).then(({ data: { data } }) => {
         const imageData: {
@@ -126,4 +161,17 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+const mapStateToProps = (state: InitialProps) => ({
+  data: getData(state),
+  dataGrouped: getdataGrouped(state),
+  inputTeg: getInputTeg(state),
+  loadError: getLoadError(state),
+  buttonDisabled: getButtonDisabled(state),
+});
+
+const mapDispatchToProps = (dispatch: Function) => ({
+  getResource: () => dispatch(Operation.getResource(inputTeg, data)),
+});
+
+export { App };
+export default connect(mapStateToProps, mapDispatchToProps)(App);
